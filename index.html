@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made with Love | Bakery & Florist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b81;
+            --secondary: #ff4757;
+            --bg: #fff0f3;
+            --text: #2f3542;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Padauk', sans-serif;
+            margin: 0;
+            background-color: #fcfcfc;
+            color: var(--text);
+            padding-bottom: 80px; /* Space for bottom cart bar */
+        }
+
+        /* --- Header & Hero --- */
+        header {
+            background: var(--white);
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- Product Grid --- */
+        .section-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: var(--text);
+            font-size: 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+        }
+
+        @media(min-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 30px;
+            }
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .product-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .add-btn {
+            background: var(--text);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: auto;
+            transition: 0.2s;
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- Floating Cart Bar --- */
+        .cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: white;
+            width: 90%;
+            max-width: 500px;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            cursor: pointer;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .cart-bar.active {
+            visibility: visible;
+            opacity: 1;
+            bottom: 30px;
+        }
+
+        .checkout-btn-mini {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* --- Checkout Modal (Overlay) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* --- Form Styles (Recycled) --- */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Padauk', sans-serif; }
+        .order-summary { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed #ccc; font-size: 0.9rem; }
+        
+        .confirm-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .confirm-btn:disabled { background: #ccc; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">Made with Love ❤️</a>
+        <div style="font-size: 14px; font-weight: bold;">
+            Total: <span id="header-total">0</span> ¥
+        </div>
+    </header>
+
+    <div class="hero">
+        <div>
+            <h1>Sweet Moments & <br> Beautiful Blooms</h1>
+            <p>Japan Wide Delivery 🇯🇵</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">🎂 Delicious Cakes</h2>
+        <div class="product-grid" id="cake-grid">
+            </div>
+
+        <h2 class="section-title">💐 Fresh Flowers</h2>
+        <div class="product-grid" id="flower-grid">
+            </div>
+    </div>
+
+    <div class="cart-bar" id="cartBar" onclick="openCheckout()">
+        <div>
+            <span id="cart-count">0</span> Items | <span id="cart-total">0</span> ¥
+        </div>
+        <button class="checkout-btn-mini">Checkout ></button>
+    </div>
+
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCheckout()">&times;</span>
+            <h3 style="text-align:center; color: var(--primary);">Checkout Form</h3>
+            
+            <div class="order-summary" id="orderSummaryText">
+                </div>
+
+            <form id="deliveryForm">
+                <div class="form-group">
+                    <label>လက်ခံသူအမည်</label>
+                    <input type="text" id="name" required placeholder="Hnin Sandar Win">
+                </div>
+                <div class="form-group">
+                    <label>ဖုန်းနံပါတ်</label>
+                    <input type="tel" id="phone" required placeholder="090-xxxx-xxxx">
+                </div>
+                <div class="form-group">
+                    <label>လိပ်စာအပြည့်အစုံ</label>
+                    <textarea id="address" rows="2" required placeholder="Postal Code, Address..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ကိတ်/ပန်းစည်းပေါ် ရေးလိုသောစာ</label>
+                    <input type="text" id="cakeMessage" placeholder="Happy Birthday!">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>နေ့စွဲ</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>အချိန်</label>
+                        <input type="time" id="time" required>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="finalOrderDetails">
+
+                <button type="submit" class="confirm-btn" id="submitBtn">Order အတည်ပြုမည်</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. Firebase Setup
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArgX3vs0WgtQFuCft0IgLeE20rVJlUmEg",
+            authDomain: "floral-f9e53.firebaseapp.com",
+            projectId: "floral-f9e53",
+            storageBucket: "floral-f9e53.firebasestorage.app",
+            messagingSenderId: "471381377866",
+            appId: "1:471381377866:web:830c171c58c06904e7f7b3",
+            measurementId: "G-QPG84K08SG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 2. Product Data
+        const products = [
+            { id: 1, type: 'cake', name: "16cm Vanilla Cake", price: 4000, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500" },
+            { id: 2, type: 'cake', name: "Chocolate Drip Cake", price: 5500, img: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=500" },
+            { id: 3, type: 'cake', name: "Strawberry Shortcake", price: 4500, img: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=500" },
+            { id: 4, type: 'flower', name: "Red Roses Bouquet", price: 3000, img: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=500" },
+            { id: 5, type: 'flower', name: "Sunflowers Set", price: 3500, img: "https://images.unsplash.com/photo-1470509037663-253afd7f0f51?w=500" },
+            { id: 6, type: 'flower', name: "Mixed Premium", price: 6000, img: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500" }
+        ];
+
+        // 3. Render Products
+        function renderProducts() {
+            const cakeGrid = document.getElementById('cake-grid');
+            const flowerGrid = document.getElementById('flower-grid');
+
+            products.forEach(product => {
+                const card = `
+                    <div class="product-card">
+                        <img src="${product.img}" class="product-img" alt="${product.name}">
+                        <div class="product-info">
+                            <div class="product-title">${product.name}</div>
+                            <div class="product-price">${product.price} ¥</div>
+                            <button class="add-btn" onclick="window.addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+                if(product.type === 'cake') cakeGrid.innerHTML += card;
+                else flowerGrid.innerHTML += card;
+            });
+        }
+
+        // 4. Cart Logic
+        let cart = [];
+
+        window.addToCart = (id) => {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartUI();
+        };
+
+        function updateCartUI() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('header-total').innerText = total;
+            document.getElementById('cart-total').innerText = total;
+            document.getElementById('cart-count').innerText = cart.length;
+
+            if (cart.length > 0) {
+                document.getElementById('cartBar').classList.add('active');
+            }
+        }
+
+        // 5. Checkout Logic
+        window.openCheckout = () => {
+            if(cart.length === 0) return;
+            
+            const modal = document.getElementById('checkoutModal');
+            const summaryDiv = document.getElementById('orderSummaryText');
+            
+            // Build Summary String
+            let summaryHTML = "<strong>Order Items:</strong><br>";
+            let orderString = "";
+            let total = 0;
+
+            cart.forEach(item => {
+                summaryHTML += `• ${item.name} - ${item.price}¥<br>`;
+                orderString += `${item.name} (${item.price}¥), `;
+                total += item.price;
+            });
+
+            summaryHTML += `<hr><strong>Total: ${total} ¥</strong>`;
+            orderString += `TOTAL = ${total}¥`;
+
+            summaryDiv.innerHTML = summaryHTML;
+            document.getElementById('finalOrderDetails').value = orderString;
+            
+            modal.style.display = "block";
+        }
+
+        window.closeCheckout = () => {
+            document.getElementById('checkoutModal').style.display = "none";
+        }
+
+        // 6. Submit Order to Firebase
+        document.getElementById('deliveryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            const orderData = {
+                receiverName: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                cakeMessage: document.getElementById('cakeMessage').value,
+                deliveryDate: document.getElementById('date').value,
+                deliveryTime: document.getElementById('time').value,
+                orderDetails: document.getElementById('finalOrderDetails').value,
+                timestamp: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "orders"), orderData);
+                alert("Order Successful! ကျေးဇူးတင်ပါသည် ❤️");
+                cart = []; // Clear cart
+                updateCartUI();
+                document.getElementById('cartBar').classList.remove('active');
+                closeCheckout();
+                document.getElementById('deliveryForm').reset();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.innerText = "Order အတည်ပြုမည်";
+                btn.disabled = false;
+            }
+        });
+
+        // Init
+        renderProducts();
+
+    </script>
+</body>
+</html>
